@@ -76,7 +76,7 @@ SELECT *
 FROM diabetes_data
 LIMIT 10
 
-Step 4: Confirming the Number of Rows Imported
+**Step 4: Confirming the Number of Rows Imported**
 
 After importing the data, it's crucial to confirm that the correct number of rows has been transferred into the 'diabetes_data' table. This step helps ensure data completeness and verification that the import process was successful.
 
