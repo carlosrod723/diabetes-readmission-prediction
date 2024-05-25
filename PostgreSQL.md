@@ -82,9 +82,22 @@ After importing the data, it's crucial to confirm that the correct number of row
 
 SQL Query:
 
-SQL
 SELECT COUNT(*)
 FROM diabetes_data
 
 The output returned 101,766 rows, which tells me the data has been successfully imported
+
+**Step 5: Assess the Distribution of Readmission Status**
+
+Before proceeding with data cleaning and feature engineering, I need to understand the distribution of my target variable, readmitted. This will help me assess the class balance in the dataset and inform my modeling choices.
+
+SQL Query:
+
+SELECT readmitted, COUNT (*) AS count
+FROM diabetes_data
+GROUP BY readmitted
+
+The initial analysis reveals a class imbalance in the target variable (readmitted), which will need to be addressed during modeling.
+
+
 
