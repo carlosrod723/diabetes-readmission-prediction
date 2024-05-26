@@ -9,7 +9,7 @@ The initial step in my project involves establishing the foundation for data sto
 #### SQL Query:
 
 - CREATE TABLE diabetes_data (
-   - encounter_id INT,
+    - encounter_id INT,
     - patient_nbr INT,
     - race VARCHAR(255),
     - gender VARCHAR(255),
@@ -162,11 +162,20 @@ To identify columns with missing values and the count of missing values in each 
     - COUNT(*) - COUNT(readmitted) AS readmitted_missing
 - FROM diabetes_data;
 
-All columns returned 0 across the board
+### Step 7: Drop Columns with High Percentage of Missing Values
 
-### Step 7: Verify Data Types
+To ensure data integrity, I've decided to drop columns with a high percentage of missing values, such as 'max_glu_serum', 'A1Cresult', and 'weight'.
 
-Ensure that all columns have the correct data type for analysis. If necessary, I will alter the data to match my requirements. 
+#### SQL Query:
+
+- ALTER TABLE diabetes_data
+- DROP COLUMN max_glu_serum,
+- DROP COLUMN A1Cresult,
+- DROP COLUMN weight;
+
+### Step 8: Verify Data Types
+
+Ensure that all columns have the correct data type for analysis. If necessary, I will alter the data to match my requirements.
 
 #### SQL Query:
 
@@ -176,76 +185,16 @@ Ensure that all columns have the correct data type for analysis. If necessary, I
 - FROM 
     - information_schema.columns 
 - WHERE 
-    - table_name = 'diabetes_data'
-
- The data types seem generally correct. There are a few things, however, that I'm going to adjust, specially for some of the columns that should be numeric but are currently 'character varying'.
-
-### Step 8: Alter Necessary Data Types
-
- I'm going to convert the 'age' and 'weight' columns to their appropriate numeric data types. 
-
-#### SQL Query:
-
-- SELECT DISTINCT weight
-- FROM diabetes_data
-- WHERE weight !~ '^[0-9.]+$';
+    - table_name = 'diabetes_data';
  
-After executing this code, I noticed that the values are in ranges, and not directly numeric. I also noticed that there were non-numeric values like '?' that need to be handled. I will proceed with this first.
-
-#### Step 8.1: Update Non-numeri Values in the 'weight' Column
-
-#### SQL Query:
-
-To identify non-numeric values in the weight column:
-
-- SELECT DISTINCT weight 
-- FROM diabetes_data 
-- WHERE NOT (weight ~ '^[0-9.]+$');
-
-#### Step 8.2: Convert 'weight' ranges to Midpoints
-
-#### SQL Query:
-
-To replace non-numeric values ("?") with NULL and convert weight ranges to their midpoints:
-
-- UPDATE diabetes_data
-- SET weight = NULL
-- WHERE weight = '?';
-
-- UPDATE diabetes_data
-- SET weight = '12.5' WHERE weight = '[0-25)';
-- UPDATE diabetes_data
-- SET weight = '37.5' WHERE weight = '[25-50)';
-- UPDATE diabetes_data
-- SET weight = '62.5' WHERE weight = '[50-75)';
-- UPDATE diabetes_data
-- SET weight = '87.5' WHERE weight = '[75-100)';
-- UPDATE diabetes_data
-- SET weight = '112.5' WHERE weight = '[100-125)';
-- UPDATE diabetes_data
-- SET weight = '137.5' WHERE weight = '[125-150)';
-- UPDATE diabetes_data
-- SET weight = '162.5' WHERE weight = '[150-175)';
-- UPDATE diabetes_data
-- SET weight = '187.5' WHERE weight = '[175-200)';
-- UPDATE diabetes_data
-- SET weight = '200' WHERE weight = '>200';
-
-#### Step 8.3: Convert 'weight' Column to Numeric
-
-Now that I've replaced the ranges with the midpoints, I will convert the 'weight' column to 'NUMERIC'.
-
-#### SQL Query:
-
-- ALTER TABLE diabetes_data
-- ALTER COLUMN weight TYPE NUMERIC USING (NULLIF(weight, '')::NUMERIC);
-
 ### Step 9: Handle Missing Values in Categorical Columns
 
-Since I had no missing values initially, I can now verify and and ensure the integrity of the categorical columns. 
+I can now verify and ensure the integrity of the categorical columns.
 
 #### SQL Query:
 
+
+- Copy code
 - UPDATE diabetes_data
 - SET race = 'Unknown'
 - WHERE race IS NULL OR race = '';
@@ -274,24 +223,10 @@ Since I had no missing values initially, I can now verify and and ensure the int
 - SET diag_3 = 'Unknown'
 - WHERE diag_3 IS NULL OR diag_3 = '';
 
-### Step 10: Ensure Data Types of Other Columns
+### Step 10: Export the Updated Dataset to a CSV File
 
-I'm going to verify and alter data types for other relevant columns to ensure they are correctly formatted for the analysis. 
+Executed the following command in PostgreSQL to export the updated dataset:
 
-Convert integer colummns:
+#### SQL Query:
 
-- ALTER TABLE diabetes_data
-- ALTER COLUMN num_lab_procedures TYPE INTEGER USING (num_lab_procedures::INTEGER),
-- ALTER COLUMN num_procedures TYPE INTEGER USING (num_procedures::INTEGER),
-- ALTER COLUMN num_medications TYPE INTEGER USING (num_medications::INTEGER),
-- ALTER COLUMN number_outpatient TYPE INTEGER USING (number_outpatient::INTEGER),
-- ALTER COLUMN number_emergency TYPE INTEGER USING (number_emergency::INTEGER),
-- ALTER COLUMN number_inpatient TYPE INTEGER USING (number_inpatient::INTEGER),
-- ALTER COLUMN number_diagnoses TYPE INTEGER USING (number_diagnoses::INTEGER);
-
-Convert ID columns:
-
-- ALTER TABLE diabetes_data
-- ALTER COLUMN admission_type_id TYPE INTEGER USING (admission_type_id::INTEGER),
-- ALTER COLUMN discharge_disposition_id TYPE INTEGER USING (discharge_disposition_id::INTEGER),
-- ALTER COLUMN admission_source_id TYPE INTEGER USING (admission_source_id::INTEGER);
+- COPY diabetes_data TO '/Users/carlos72386/Desktop/updated_diabetes_data.csv' DELIMITER ',' CSV HEADER;
