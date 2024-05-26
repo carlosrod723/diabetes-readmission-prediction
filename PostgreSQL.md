@@ -1,3 +1,7 @@
+## Data Cleaning & Preparation in PostgreSQL
+
+To prepare the 'diabetes_data' dataset for modeling, data cleaning and preprocessing will be performed directly in PostgreSQL.
+
 ### Step 1: Creating the 'diabetes_data' Table
 
 The initial step in my project involves establishing the foundation for data storage and analysis by creating a table in the PostgreSQL database. This table, named 'diabetes_data', will serve as the repository for all the information extracted from the dataset related to patient demographics, medical histories, diagnoses, medications, and outcomes. The structure of the diabetes_data table captures the relevant attributes present in the dataset, aligning with the project's goal of predicting hospital readmissions.
@@ -101,33 +105,156 @@ Understanding the distribution of the target variable, readmitted, helps assess 
 
 Initial analysis reveals a class imbalance in the target variable, which will need to be addressed during modeling.
 
-### Step 6: Handling Missing Values
+### Step 6: Identify Missing Values
 
-Identifying and addressing missing values ensures data integrity and prepares it for analysis. Given the high percentage of missing values in the max_glu_serum and A1Cresult columns, I've decided to drop them from the analysis. The remaining columns don't have significant missing values, so no further imputation is necessary.
-
-Columns max_glu_serum and A1Cresult have a very high percentage of missing values (94.75% and 83.28%, respectively). Keeping these columns would not add meaningful information to the model due to the significant lack of data. Dropping them helps reduce noise and complexity in the dataset.
-
-Replacing missing values in categorical columns with 'Unknown' is a common practice in data preprocessing, serving several key purposes. Firstly, it maintains data integrity by ensuring that every record has a value, preventing errors or issues during subsequent analysis and modeling. Secondly, it makes the dataset compatible with many machine learning algorithms that require complete data and cannot handle null values directly. Thirdly, the 'Unknown' category can provide valuable insights during analysis, highlighting areas where data collection may need improvement or uncovering patterns related to missing information. Finally, it avoids the potential bias that could be introduced by imputing missing categorical values with statistical measures like mode or median, as these might not accurately represent the missing data.
-
-Assigning a value of 0 to missing weight values indicates that the weight data was not recorded or is not applicable. This is a simple imputation strategy that avoids introducing artificial data.
-
-Imputing missing values in numerical columns with the median is a robust strategy for several reasons. The median, as the middle value in a sorted dataset, is less sensitive to extreme values or outliers compared to the mean. This stability makes it a reliable choice for filling in missing data points while preserving the overall statistical properties of the dataset. By using the median, I can ensure that the imputed values are consistent with the central tendency of the existing data, avoiding the introduction of artificial extremes that could distort the analysis. This approach also helps maintain the integrity of the dataset, potentially leading to improved performance of machine learning models trained on this data, as the underlying distribution is not significantly altered.
-
-These are all the steps I took in the following SQL query:
+To identify columns with missing values and the count of missing values in each column, I executed the following:
 
 #### SQL Query:
 
--- Drop columns with high percentage of missing values
-- ALTER TABLE diabetes_data
-- DROP COLUMN max_glu_serum,
-- DROP COLUMN A1Cresult;
+- SELECT 
+    - COUNT(*) - COUNT(race) AS race_missing,
+    - COUNT(*) - COUNT(gender) AS gender_missing,
+    - COUNT(*) - COUNT(age) AS age_missing,
+    - COUNT(*) - COUNT(weight) AS weight_missing,
+    - COUNT(*) - COUNT(admission_type_id) AS admission_type_id_missing,
+    - COUNT(*) - COUNT(discharge_disposition_id) AS discharge_disposition_id_missing,
+    - COUNT(*) - COUNT(admission_source_id) AS admission_source_id_missing,
+    - COUNT(*) - COUNT(time_in_hospital) AS time_in_hospital_missing,
+    - COUNT(*) - COUNT(payer_code) AS payer_code_missing,
+    - COUNT(*) - COUNT(medical_specialty) AS medical_specialty_missing,
+    - COUNT(*) - COUNT(num_lab_procedures) AS num_lab_procedures_missing,
+    - COUNT(*) - COUNT(num_procedures) AS num_procedures_missing,
+    - COUNT(*) - COUNT(num_medications) AS num_medications_missing,
+    - COUNT(*) - COUNT(number_outpatient) AS number_outpatient_missing,
+    - COUNT(*) - COUNT(number_emergency) AS number_emergency_missing,
+    - COUNT(*) - COUNT(number_inpatient) AS number_inpatient_missing,
+    - COUNT(*) - COUNT(diag_1) AS diag_1_missing,
+    - COUNT(*) - COUNT(diag_2) AS diag_2_missing,
+    - COUNT(*) - COUNT(diag_3) AS diag_3_missing,
+    - COUNT(*) - COUNT(number_diagnoses) AS number_diagnoses_missing,
+    - COUNT(*) - COUNT(max_glu_serum) AS max_glu_serum_missing,
+    - COUNT(*) - COUNT(A1Cresult) AS A1Cresult_missing,
+    - COUNT(*) - COUNT(metformin) AS metformin_missing,
+    - COUNT(*) - COUNT(repaglinide) AS repaglinide_missing,
+    - COUNT(*) - COUNT(nateglinide) AS nateglinide_missing,
+    - COUNT(*) - COUNT(chlorpropamide) AS chlorpropamide_missing,
+    - COUNT(*) - COUNT(glimepiride) AS glimepiride_missing,
+    - COUNT(*) - COUNT(acetohexamide) AS acetohexamide_missing,
+    - COUNT(*) - COUNT(glipizide) AS glipizide_missing,
+    - COUNT(*) - COUNT(glyburide) AS glyburide_missing,
+    - COUNT(*) - COUNT(tolbutamide) AS tolbutamide_missing,
+    - COUNT(*) - COUNT(pioglitazone) AS pioglitazone_missing,
+    - COUNT(*) - COUNT(rosiglitazone) AS rosiglitazone_missing,
+    - COUNT(*) - COUNT(acarbose) AS acarbose_missing,
+    - COUNT(*) - COUNT(miglitol) AS miglitol_missing,
+    - COUNT(*) - COUNT(troglitazone) AS troglitazone_missing,
+    - COUNT(*) - COUNT(tolazamide) AS tolazamide_missing,
+    - COUNT(*) - COUNT(examide) AS examide_missing,
+    - COUNT(*) - COUNT(citoglipton) AS citoglipton_missing,
+    - COUNT(*) - COUNT(insulin) AS insulin_missing,
+    - COUNT(*) - COUNT(glyburide_metformin) AS glyburide_metformin_missing,
+    - COUNT(*) - COUNT(glipizide_metformin) AS glipizide_metformin_missing,
+    - COUNT(*) - COUNT(glimepiride_pioglitazone) AS glimepiride_pioglitazone_missing,
+    - COUNT(*) - COUNT(metformin_rosiglitazone) AS metformin_rosiglitazone_missing,
+    - COUNT(*) - COUNT(metformin_pioglitazone) AS metformin_pioglitazone_missing,
+    - COUNT(*) - COUNT(change) AS change_missing,
+    - COUNT(*) - COUNT(diabetesMed) AS diabetesMed_missing,
+    - COUNT(*) - COUNT(readmitted) AS readmitted_missing
+- FROM diabetes_data;
 
--- Replace missing values in categorical columns with 'Unknown'
+All columns returned 0 across the board
+
+### Step 7: Verify Data Types
+
+Ensure that all columns have the correct data type for analysis. If necessary, I will alter the data to match my requirements. 
+
+#### SQL Query:
+
+- SELECT 
+    - column_name, 
+    - data_type 
+- FROM 
+    - information_schema.columns 
+- WHERE 
+    - table_name = 'diabetes_data'
+
+ The data types seem generally correct. There are a few things, however, that I'm going to adjust, specially for some of the columns that should be numeric but are currently 'character varying'.
+
+### Step 8: Alter Necessary Data Types
+
+ I'm going to convert the 'age' and 'weight' columns to their appropriate numeric data types. 
+
+#### SQL Query:
+
+- SELECT DISTINCT weight
+- FROM diabetes_data
+- WHERE weight !~ '^[0-9.]+$';
+ 
+After executing this code, I noticed that the values are in ranges, and not directly numeric. I also noticed that there were non-numeric values like '?' that need to be handled. I will proceed with this first.
+
+#### Step 8.1: Update Non-numeri Values in the 'weight' Column
+
+#### SQL Query:
+
+To identify non-numeric values in the weight column:
+
+- SELECT DISTINCT weight 
+- FROM diabetes_data 
+- WHERE NOT (weight ~ '^[0-9.]+$');
+
+#### Step 8.2: Convert 'weight' ranges to Midpoints
+
+#### SQL Query:
+
+To replace non-numeric values ("?") with NULL and convert weight ranges to their midpoints:
+
+- UPDATE diabetes_data
+- SET weight = NULL
+- WHERE weight = '?';
+
+- UPDATE diabetes_data
+- SET weight = '12.5' WHERE weight = '[0-25)';
+- UPDATE diabetes_data
+- SET weight = '37.5' WHERE weight = '[25-50)';
+- UPDATE diabetes_data
+- SET weight = '62.5' WHERE weight = '[50-75)';
+- UPDATE diabetes_data
+- SET weight = '87.5' WHERE weight = '[75-100)';
+- UPDATE diabetes_data
+- SET weight = '112.5' WHERE weight = '[100-125)';
+- UPDATE diabetes_data
+- SET weight = '137.5' WHERE weight = '[125-150)';
+- UPDATE diabetes_data
+- SET weight = '162.5' WHERE weight = '[150-175)';
+- UPDATE diabetes_data
+- SET weight = '187.5' WHERE weight = '[175-200)';
+- UPDATE diabetes_data
+- SET weight = '200' WHERE weight = '>200';
+
+#### Step 8.3: Convert 'weight' Column to Numeric
+
+Now that I've replaced the ranges with the midpoints, I will convert the 'weight' column to 'NUMERIC'.
+
+#### SQL Query:
+
+- ALTER TABLE diabetes_data
+- ALTER COLUMN weight TYPE NUMERIC USING (NULLIF(weight, '')::NUMERIC);
+
+### Step 9: Handle Missing Values in Categorical Columns
+
+Since I had no missing values initially, I can now verify and and ensure the integrity of the categorical columns. 
+
+#### SQL Query:
+
 - UPDATE diabetes_data
 - SET race = 'Unknown'
 - WHERE race IS NULL OR race = '';
 
 - UPDATE diabetes_data
+- SET gender = 'Unknown'
+- WHERE gender IS NULL OR gender = '';
+
+- UPDATE diabetes_data
 - SET payer_code = 'Unknown'
 - WHERE payer_code IS NULL OR payer_code = '';
 
@@ -135,143 +262,36 @@ These are all the steps I took in the following SQL query:
 - SET medical_specialty = 'Unknown'
 - WHERE medical_specialty IS NULL OR medical_specialty = '';
 
-- UPDATE diabetes_data
-- SET gender = 'Unknown'
-- WHERE gender IS NULL OR gender = '';
-
--- Replace missing values in 'weight' with 0
-- UPDATE diabetes_data
-- SET weight = 0
-- WHERE weight IS NULL;
-
--- Replace missing values in numerical columns with the median value
--- Replace missing values in `num_lab_procedures`
-- UPDATE diabetes_data
-- SET num_lab_procedures = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY num_lab_procedures) FROM diabetes_data)
-- WHERE num_lab_procedures IS NULL;
-
--- Replace missing values in `num_procedures`
-- UPDATE diabetes_data
-- SET num_procedures = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY num_procedures) FROM diabetes_data)
-- WHERE num_procedures IS NULL;
-
--- Replace missing values in `num_medications`
-- UPDATE diabetes_data
-- SET num_medications = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY num_medications) FROM diabetes_data)
--  WHERE num_medications IS NULL;
-
--- Replace missing values in `number_outpatient`
-- UPDATE diabetes_data
-- SET number_outpatient = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY number_outpatient) FROM diabetes_data)
-- WHERE number_outpatient IS NULL;
-
--- Replace missing values in `number_emergency`
-- UPDATE diabetes_data
-- SET number_emergency = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY number_emergency) FROM diabetes_data)
-- WHERE number_emergency IS NULL;
-
--- Replace missing values in `number_inpatient`
-- UPDATE diabetes_data
-- SET number_inpatient = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY number_inpatient) FROM diabetes_data)
-- WHERE number_inpatient IS NULL;
-
--- Replace missing values in `number_diagnoses`
-- UPDATE diabetes_data
-- SET number_diagnoses = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY number_diagnoses) FROM diabetes_data)
-- WHERE number_diagnoses IS NULL;
-
--- Replace missing values in `time_in_hospital`
-- UPDATE diabetes_data
-- SET time_in_hospital = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY time_in_hospital) FROM diabetes_data)
-- WHERE time_in_hospital IS NULL;
-
--- Replace missing values in `encounter_id`
-- UPDATE diabetes_data
-- SET encounter_id = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY encounter_id) FROM diabetes_data)
-- WHERE encounter_id IS NULL;
-
--- Replace missing values in `patient_nbr`
-- UPDATE diabetes_data
-- SET patient_nbr = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY patient_nbr) FROM diabetes_data)
-- WHERE patient_nbr IS NULL;
-
--- Replace missing values in `admission_type_id`
-- UPDATE diabetes_data
-- SET admission_type_id = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY admission_type_id) FROM diabetes_data)
-- WHERE admission_type_id IS NULL;
-
--- Replace missing values in `discharge_disposition_id`
-- UPDATE diabetes_data
-- SET discharge_disposition_id = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY discharge_disposition_id) FROM diabetes_data)
-- WHERE discharge_disposition_id IS NULL;
-
--- Replace missing values in `admission_source_id`
-- UPDATE diabetes_data
-- SET admission_source_id = (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY admission_source_id) FROM diabetes_data)
-- WHERE admission_source_id IS NULL;
-
--- Replace missing values in `diag_1`
 - UPDATE diabetes_data
 - SET diag_1 = 'Unknown'
 - WHERE diag_1 IS NULL OR diag_1 = '';
 
--- Replace missing values in `diag_2`
 - UPDATE diabetes_data
 - SET diag_2 = 'Unknown'
 - WHERE diag_2 IS NULL OR diag_2 = '';
 
--- Replace missing values in `diag_3`
 - UPDATE diabetes_data
 - SET diag_3 = 'Unknown'
 - WHERE diag_3 IS NULL OR diag_3 = '';
 
-### Step 7: Converting Data Types
+### Step 10: Ensure Data Types of Other Columns
 
-Converting data types ensures consistency and compatibility with analysis tools. This includes converting weight to a numeric type, age to an integer, and normalizing values in the gender column.
+I'm going to verify and alter data types for other relevant columns to ensure they are correctly formatted for the analysis. 
 
-#### SQL Query:
-
--- Convert 'weight' to NUMERIC
-- UPDATE diabetes_data
-- SET weight = NULL
-- WHERE weight !~ '^\d+\.?\d*$';
+Convert integer colummns:
 
 - ALTER TABLE diabetes_data
-- ALTER COLUMN weight TYPE NUMERIC USING (NULLIF(weight, '')::NUMERIC);
+- ALTER COLUMN num_lab_procedures TYPE INTEGER USING (num_lab_procedures::INTEGER),
+- ALTER COLUMN num_procedures TYPE INTEGER USING (num_procedures::INTEGER),
+- ALTER COLUMN num_medications TYPE INTEGER USING (num_medications::INTEGER),
+- ALTER COLUMN number_outpatient TYPE INTEGER USING (number_outpatient::INTEGER),
+- ALTER COLUMN number_emergency TYPE INTEGER USING (number_emergency::INTEGER),
+- ALTER COLUMN number_inpatient TYPE INTEGER USING (number_inpatient::INTEGER),
+- ALTER COLUMN number_diagnoses TYPE INTEGER USING (number_diagnoses::INTEGER);
 
--- Convert 'age' to INT
-- ALTER TABLE diabetes_data
-- ALTER COLUMN age TYPE INT USING (CAST(substring(age FROM '\d+') AS INT));
-
--- Normalize 'gender' values and convert data type
-- UPDATE diabetes_data
-- SET gender = CASE
-    - WHEN gender ILIKE 'male' THEN 'Male'
-    - WHEN gender ILIKE 'female' THEN 'Female'
-    - ELSE 'Unknown'
-- END;
+Convert ID columns:
 
 - ALTER TABLE diabetes_data
-- ALTER COLUMN gender TYPE VARCHAR(10);
-
--- Convert various columns to INT
-- ALTER TABLE diabetes_data
-- ALTER COLUMN admission_type_id TYPE INT USING (admission_type_id::INT),
-- ALTER COLUMN discharge_disposition_id TYPE INT USING (discharge_disposition_id::INT),
-- ALTER COLUMN admission_source_id TYPE INT USING (admission_source_id::INT),
-- ALTER COLUMN num_lab_procedures TYPE INT USING (num_lab_procedures::INT),
-- ALTER COLUMN num_procedures TYPE INT USING (num_procedures::INT),
-- ALTER COLUMN num_medications TYPE INT USING (num_medications::INT),
-- ALTER COLUMN number_outpatient TYPE INT USING (number_outpatient::INT),
-- ALTER COLUMN number_emergency TYPE INT USING (number_emergency::INT),
-- ALTER COLUMN number_inpatient TYPE INT USING (number_inpatient::INT),
-- ALTER COLUMN number_diagnoses TYPE INT USING (number_diagnoses::INT);
-
--- Replace missing values in 'payer_code' and 'medical_specialty' with 'Unknown'
-- UPDATE diabetes_data
-- SET payer_code = 'Unknown'
-- WHERE payer_code IS NULL OR payer_code = '';
-
-- UPDATE diabetes_data
-- SET medical_specialty = 'Unknown'
-- WHERE medical_specialty IS NULL OR medical_specialty = '';
+- ALTER COLUMN admission_type_id TYPE INTEGER USING (admission_type_id::INTEGER),
+- ALTER COLUMN discharge_disposition_id TYPE INTEGER USING (discharge_disposition_id::INTEGER),
+- ALTER COLUMN admission_source_id TYPE INTEGER USING (admission_source_id::INTEGER);
