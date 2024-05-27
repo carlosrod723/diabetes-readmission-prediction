@@ -50,10 +50,10 @@ Documentation: The entire project, including data preprocessing steps, code for 
 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
 
+
+
+
 ![Readmission Status](Readmission Status.png)
-
-
-
 
 
 
