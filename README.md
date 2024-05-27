@@ -52,7 +52,7 @@ Code: Jupyter notebook(s) containing the analysis and model development are avai
 
 
 
-![Readmission Status](Readmission Status.png)
+![Readmission Status](images/Readmission Status.png)
 
 
 
