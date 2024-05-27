@@ -1,3 +1,55 @@
+# Predicting 30-Day Hospital Readmission in Diabetes Patients: An End-to-End Machine Learning Project
+
+## Project Overview
+
+This project aims to leverage machine learning to predict the likelihood of 30-day hospital readmission for patients with diabetes. By accurately identifying high-risk patients, we can empower healthcare providers to implement targeted interventions, ultimately reducing readmissions, improving patient outcomes, and optimizing resource allocation.
+
+## Business Value
+
+This project addresses a critical challenge in the healthcare industry, where reducing readmission rates is a key performance indicator. By deploying a predictive model, hospitals can:
+
+Improve Patient Care: Identify high-risk patients and provide additional support (follow-up appointments, medication management, self-care education).
+
+Reduce Costs: Avoid the financial burden of unplanned readmissions.
+
+Optimize Resource Allocation: Focus resources on high-risk patients.
+
+Enhance Hospital Reputation: Demonstrate a commitment to patient well-being and quality of care.
+
+## Data Source
+
+Dataset: Diabetes 130- US Hospitals for Years 1999-2008 from UC Irvine Machine Learning Repository
+
+The dataset represents ten years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. Each row concerns hospital records of patients diagnosed with diabetes, who underwent laboratory, medications, and stayed up to 14 days. The goal is to determine the readmission of the patient within 30 days of discharge. The problem is important for the following reasons. Despite high-quality evidence showing improved clinical outcomes for diabetic patients who receive various preventive and therapeutic interventions, many patients do not receive them. This can be partially attributed to arbitrary diabetes management in hospital environments, which fail to attend to glycemic control. Failure to provide proper diabetes care not only increases the managing costs for the hospitals (as the patients are readmitted) but also impacts the morbidity and mortality of the patients, who may face complications associated with diabetes.
+
+## Refined Problem Statement
+
+Hospital readmissions within 30 days of discharge are a significant concern in healthcare. Our project will develop a machine learning model to predict the probability of 30-day readmission for patients with diabetes, enabling healthcare providers to intervene and improve patient outcomes.
+
+## Methodology
+
+### 1. Data Upload and Preprocessing (PostgreSQL pgAdmin 4)
+
+Import: The raw dataset (CSV) is imported into a PostgreSQL database.
+
+Cleaning: Missing values are handled, data types are converted (e.g., age to ordered categorical), and columns with excessive missing values are dropped (e.g., max_glu_serum, A1Cresult).
+
+Preparation: The cleaned dataset is exported to a CSV file for further analysis.
+
+### 2. Exploratory Data Analysis and Model Development (AWS SageMaker Jupyter Notebook)
+
+Analysis: The dataset is loaded into a Jupyter notebook in AWS SageMaker.
+
+Visualization: Exploratory data analysis is performed to uncover insights and relationships within the data.
+
+Model Building: Various machine learning models are developed and evaluated to select the best performing model for predicting readmission.
+
+### 3. Model Deployment 
+
+Documentation: The entire project, including data preprocessing steps, code for analysis and model development, and model evaluation results, is thoroughly documented in this repository's README file.
+
+Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
+
 Refined Problem Statement:
 
 Hospital readmissions within 30 days of discharge are a significant concern in healthcare due to their impact on patient well-being and healthcare costs. Our project aims to leverage machine learning to predict the likelihood of readmission within 30 days for patients with diabetes. By accurately identifying high-risk patients, we empower healthcare providers to implement targeted interventions, ultimately reducing readmissions, improving patient outcomes, and optimizing the allocation of hospital resources.
@@ -11,35 +63,6 @@ Reduce Costs: Avoid the financial burden associated with unplanned readmissions,
 Optimize Resource Allocation: Focus resources on patients who need them most, ensuring that those at higher risk of readmission receive adequate care and attention.
 Enhance Hospital Reputation: Demonstrate a commitment to patient well-being and quality of care by actively working to prevent readmissions.
 
-
-The first step is to explore the data to understand its structure, contents, and potential issues that need to be addressed before proceeding with analysis. Given that the data is in a CSV file, we will use pandas to read it and display the first 5 rows and all columns.
-
-The dataset contains information about patient encounters, demographics, medications, diagnoses, and readmission status. Many columns are already of type int64, which is suitable for our analysis. However, some columns that should be numeric are currently classified as objects, likely due to non-numeric characters. Additionally, there are missing values represented as '?'.
-
-Given that the columns max_glu_serum and A1Cresult have a large number of missing values, we will drop them. We will replace the '?' character with nulls in the remaining columns and then convert the relevant columns to numeric.
-
-We will also convert the age column to an ordered categorical type for easier analysis and modeling later.
-
-Since the data is already in a CSV format, we can directly import it into PostgreSQL. We will assume that the column names in the CSV file match the column names in the PostgreSQL table.
-
-
-This project demonstrates an end-to-end machine learning pipeline for predicting hospital readmissions within 30 days for diabetes patients. The pipeline includes data preprocessing, feature engineering, model development, and evaluation, all documented and implemented using PostgreSQL, Python, and AWS SageMaker.
-
-We start by using the Diabetes 130-US Hospitals for Years 1999-2008 dataset from the UCI Machine Learning Repository. The dataset contains detailed information about patient demographics, medical histories, diagnoses, medications, and outcomes.
-
-Steps Overview:
-
-Data Upload and Preprocessing with PostgreSQL:
-
-We import the dataset into PostgreSQL for initial data cleaning and preprocessing.
-The dataset is stored in a table named diabetes_data, where we handle missing values, convert data types, and ensure data integrity.
-Detailed SQL scripts are provided for creating the table, importing data, and performing necessary transformations.
-Exporting and Uploading to AWS SageMaker:
-
-The cleaned and processed dataset is exported from PostgreSQL to a CSV file.
-The CSV file is then uploaded to an AWS S3 bucket.
-Using AWS SageMaker, we load the data from S3 into a Jupyter notebook for further analysis, visualization, and model development.
-This project aims to showcase the complete workflow, from raw data to a deployed machine learning model, using a combination of SQL for data handling and Python for machine learning, all while leveraging AWS's scalable infrastructure.
 
 
 # Initialize SageMaker session
@@ -75,9 +98,6 @@ xgb.fit({'train': TrainingInput(train_data_s3_path), 'validation': TrainingInput
 
 # Deploy the model
 predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m5.large')
-
-# Make predictions
-import pandas as pd
 
 # Example prediction (ensure your test data is prepared)
 test_data = pd.read_csv('test_data.csv')  # Load your test data
