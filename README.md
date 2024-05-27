@@ -52,6 +52,14 @@ Documentation: The entire project, including data preprocessing steps, code for 
 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook(3).ipynb'.
 
+#### 4. Class Definitions
+
+Important to note:
+
+Class 0: Not readmitted
+Class 1: Readmitted within 30 days
+Class 2: Readmitted after 30 days
+
 ### VI- Dataset EDA Analysis 
 
 ##### 1. Analysis of the Diabetes Dataset for Numeric Columns
@@ -242,9 +250,68 @@ Accuracy: The fraction of total instances that were correctly classified by the 
 
 ### VIII- Neural Network
 
+#### 1. Model Justification
 
+The evaluated neural network is a Multilayer Perceptron (MLP), a type of feedforward artificial neural network. MLPs consist of multiple layers of interconnected nodes (neurons) that process information in a sequential manner. They are versatile and widely used for various machine learning tasks, including classification and regression.
 
-### IX- Model Deployment
+I opted for a Multilayer Perceptron (MLP) neural network to predict diabetes readmission risk due to its suitability for multi-class classification tasks, ability to learn relevant features from the data, and its computational efficiency. The MLP's relatively simple architecture strikes a balance between model complexity and performance. Additionally, the model's interpretability offers valuable insights into the factors driving readmission risk.
+
+#### 2. Layer Definitions
+
+Input Layer (Dense): This layer receives the input features and connects them to the first hidden layer. The number of neurons (64) is chosen to provide sufficient learning capacity while keeping the model manageable.
+
+Hidden Layers (Dense): I use two hidden layers with decreasing numbers of neurons (64 and 32). This structure helps the network learn increasingly abstract representations of the input data.
+
+Dropout Layers: Dropout is a regularization technique that helps prevent overfitting. By randomly deactivating a fraction (0.25) of the neurons during training, dropout forces the network to learn more robust features and reduces its reliance on specific neurons.
+
+ReLU Activation (Hidden Layers): The Rectified Linear Unit (ReLU) activation function is applied to the hidden layers. ReLU is computationally efficient and helps mitigate the vanishing gradient problem, a common issue in deep learning.
+
+Softmax Activation (Output Layer): The softmax activation function is used in the output layer. It normalizes the outputs of the neurons into a probability distribution, ensuring that the predicted probabilities for each class sum up to 1.
+
+#### 3. Confusion Matrix
+
+![Confusion Matrix](images/Confusion-Matrix.png)
+
+The confusion matrix reveals crucial insights into the performance of the neural network in predicting diabetes readmission risk categories (0, 1, and 2).
+
+Class 0 (Low Risk): The model struggles to identify patients at low risk of readmission. It correctly predicted only 54 instances of class 0, while misclassifying 541 as class 1 and a significant 886 as class 2. This suggests a tendency to overestimate the risk for individuals who are unlikely to be readmitted.
+
+Class 1 (Moderate Risk): The model performs best with this category, correctly predicting 1,626 instances. However, it still exhibits a notable number of misclassifications, with 35 instances incorrectly assigned to class 0 and 2,850 to class 2. This implies room for improvement in distinguishing moderate-risk patients from both lower and higher-risk groups.
+
+Class 2 (High Risk): The model demonstrates relatively good performance for high-risk patients, correctly identifying 5,872 instances. However, there's still a considerable number of misclassifications, with 31 instances labeled as class 0 and 1,131 as class 1. This highlights the challenge of accurately pinpointing the highest-risk individuals.
+
+The confusion matrix indicates that the model has a tendency to overestimate the risk of readmission, particularly for patients in the low-risk category. While it performs best with moderate-risk patients, there's still room for improvement in accurately classifying patients across all risk levels. Further refinement of the model, potentially through adjustments to its architecture, hyperparameters, or training data, could help enhance its ability to distinguish between the different readmission risk categories.
+
+#### 4. Classification Report
+
+This classification report evaluates the performance of a neural network model in predicting whether a diabetes patient will be readmitted to the hospital, with three classes: 0 (not readmitted), 1 (readmitted within 30 days), and 2 (readmitted after 30 days).
+
+The overall accuracy of the model is 0.58, which is moderate but leaves room for improvement. This means that the model correctly predicts the readmission status for 58% of the patients.
+
+Looking at the class-specific metrics, the precision for class 1 (readmitted within 30 days) is 0.49, indicating that only 49% of the patients predicted to be readmitted within 30 days were actually readmitted within that timeframe. This precision score is relatively low, suggesting that the model may be generating a significant number of false positives for this critical class.
+
+The recall score for class 1 is 0.36, which means that the model correctly identified only 36% of the patients who were truly readmitted within 30 days. This low recall score implies that the model is missing a substantial portion of the true positive cases, which could be problematic for hospitals aiming to identify and prioritize high-risk patients.
+The f1-score for class 1, which balances precision and recall, is 0.42, further highlighting the model's suboptimal performance in predicting readmissions within the 30-day window.
+
+While the model performs better for class 2 (readmitted after 30 days), with a higher precision of 0.61 and a recall of 0.83, the primary concern for hospitals is likely the accurate identification of patients at risk of readmission within the critical 30-day period.
+
+Overall, these results suggest that the current neural network model may not be reliable enough for accurately identifying diabetes patients at high risk of readmission within 30 days. Improvements to the model's performance, particularly in terms of precision and recall for class 1, would be necessary before deploying it in a clinical setting to support readmission risk prediction and resource allocation.
+
+### IX- Model Comparison
+
+Overall, both models show moderate performance in predicting diabetes patient readmission, with accuracy scores around 0.58. However, their performance varies across the different classes, particularly for the critical class 1 (readmitted within 30 days).
+
+For class 1, the XGBoost model has a slightly higher precision (0.50) compared to the neural network (0.49), but the neural network has a comparable recall (0.36) to the XGBoost model (0.36). This suggests that both models struggle with correctly identifying patients who will be readmitted within 30 days, with a tendency to generate false positives.
+
+In terms of the f1-score, which balances precision and recall, the XGBoost model (0.42) and the neural network (0.42) perform similarly for class 1, indicating suboptimal performance in predicting this crucial class.
+
+While the models perform better for class 2 (readmitted after 30 days), the primary concern for hospitals is likely the accurate identification of patients at risk of readmission within the 30-day window, as this has significant implications for resource allocation and patient care.
+
+Overall, based on these classification reports, neither the XGBoost model nor the neural network model appears to be sufficiently reliable for accurately predicting diabetes patient readmission within 30 days. Both models exhibit relatively low precision and recall scores for class 1, which could lead to missed opportunities for intervention or inefficient resource allocation.
+
+To better support hospital readmission risk prediction and management, further model refinement and optimization would be necessary. This could involve techniques such as feature engineering, hyperparameter tuning, or exploring alternative modeling approaches altogether. Additionally, incorporating domain knowledge from healthcare professionals could potentially improve the models' performance and practical utility.
+
+### X- Model Deployment
 
 Initially, my project aimed to leverage a comprehensive AWS ecosystem for an end-to-end diabetes readmission prediction solution. The architecture involved PostgreSQL as the database, Amazon S3 for data storage, Jupyter notebooks for development, and of course, SageMaker for model training and deployment.  I established robust Identity and Access Management (IAM) roles and policies to manage permissions across services.
 
