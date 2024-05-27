@@ -40,3 +40,47 @@ The cleaned and processed dataset is exported from PostgreSQL to a CSV file.
 The CSV file is then uploaded to an AWS S3 bucket.
 Using AWS SageMaker, we load the data from S3 into a Jupyter notebook for further analysis, visualization, and model development.
 This project aims to showcase the complete workflow, from raw data to a deployed machine learning model, using a combination of SQL for data handling and Python for machine learning, all while leveraging AWS's scalable infrastructure.
+
+
+# Initialize SageMaker session
+session = sagemaker.Session()
+
+# Define S3 paths for training and validation data
+train_data_s3_path = 's3://your-bucket/train/train_data.csv'
+validation_data_s3_path = 's3://your-bucket/validation/validation_data.csv'
+
+# Define S3 paths for model artifacts
+model_artifacts_s3_path = 's3://your-bucket/path/to/model.tar.gz'
+
+# Ensure your data is in S3
+s3_client = boto3.client('s3')
+try:
+    s3_client.head_object(Bucket='your-bucket', Key='train/train_data.csv')
+    s3_client.head_object(Bucket='your-bucket', Key='validation/validation_data.csv')
+except Exception as e:
+    print("Ensure your data files are uploaded to S3:", e)
+
+# Configure SageMaker Estimator
+xgb = Estimator(
+    image_uri=sagemaker.image_uris.retrieve("xgboost", session.boto_region_name, version="1.2-1"),
+    role=sagemaker.get_execution_role(),
+    instance_count=1,
+    instance_type='ml.m5.large',
+    output_path='s3://your-bucket/output/',
+    model_uri=model_artifacts_s3_path  # Specify the model artifacts path
+)
+
+# Train the model (or skip this step if model artifacts are already available)
+xgb.fit({'train': TrainingInput(train_data_s3_path), 'validation': TrainingInput(validation_data_s3_path)})
+
+# Deploy the model
+predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m5.large')
+
+# Make predictions
+import pandas as pd
+
+# Example prediction (ensure your test data is prepared)
+test_data = pd.read_csv('test_data.csv')  # Load your test data
+predictions = predictor.predict(test_data)
+
+print(predictions)
