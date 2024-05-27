@@ -1,10 +1,10 @@
 ## Predicting 30-Day Hospital Readmission in Diabetes Patients: An End-to-End Machine Learning Project
 
-### Project Overview
+### I- Project Overview
 
 This project aims to leverage machine learning to predict the likelihood of 30-day hospital readmission for patients with diabetes. By accurately identifying high-risk patients, we can empower healthcare providers to implement targeted interventions, ultimately reducing readmissions, improving patient outcomes, and optimizing resource allocation.
 
-### Business Value
+### II- Business Value
 
 This project addresses a critical challenge in the healthcare industry, where reducing readmission rates is a key performance indicator. By deploying a predictive model, hospitals can:
 
@@ -16,17 +16,17 @@ Optimize Resource Allocation: Focus resources on high-risk patients.
 
 Enhance Hospital Reputation: Demonstrate a commitment to patient well-being and quality of care.
 
-### Data Source
+### III- Data Source
 
 Dataset: Diabetes 130- US Hospitals for Years 1999-2008 from UC Irvine Machine Learning Repository
 
 The dataset represents ten years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. Each row concerns hospital records of patients diagnosed with diabetes, who underwent laboratory, medications, and stayed up to 14 days. The goal is to determine the readmission of the patient within 30 days of discharge. The problem is important for the following reasons. Despite high-quality evidence showing improved clinical outcomes for diabetic patients who receive various preventive and therapeutic interventions, many patients do not receive them. This can be partially attributed to arbitrary diabetes management in hospital environments, which fail to attend to glycemic control. Failure to provide proper diabetes care not only increases the managing costs for the hospitals (as the patients are readmitted) but also impacts the morbidity and mortality of the patients, who may face complications associated with diabetes.
 
-### Refined Problem Statement
+### IV- Refined Problem Statement
 
 Hospital readmissions within 30 days of discharge are a significant concern in healthcare. Our project will develop a machine learning model to predict the probability of 30-day readmission for patients with diabetes, enabling healthcare providers to intervene and improve patient outcomes.
 
-### Methodology
+### V- Methodology
 
 #### 1. Data Upload and Preprocessing (PostgreSQL pgAdmin 4)
 
@@ -50,7 +50,7 @@ Documentation: The entire project, including data preprocessing steps, code for 
 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
 
-### Dataset EDA & Model Analysis 
+### VI- Dataset EDA Analysis 
 
 ##### Analysis of the Diabetes Dataset for Numeric Columns
 
@@ -182,6 +182,7 @@ Admission Source Distribution: Most admissions come from the emergency room (7),
 
 These distributions highlight the emergency-driven nature of hospital admissions in this dataset and the prevalent discharge practices, which are crucial for understanding patient flow and resource allocation in the hospital setting.
 
+### VII- XGBoost Model
 
 
 
