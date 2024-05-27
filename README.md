@@ -50,18 +50,12 @@ Documentation: The entire project, including data preprocessing steps, code for 
 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
 
-Refined Problem Statement:
+![Distribution of Readmission Status](images/
 
-Hospital readmissions within 30 days of discharge are a significant concern in healthcare due to their impact on patient well-being and healthcare costs. Our project aims to leverage machine learning to predict the likelihood of readmission within 30 days for patients with diabetes. By accurately identifying high-risk patients, we empower healthcare providers to implement targeted interventions, ultimately reducing readmissions, improving patient outcomes, and optimizing the allocation of hospital resources.
 
-Business Value:
 
-This project addresses a critical challenge in the healthcare industry, where reducing readmission rates is a key performance indicator. By deploying a predictive model, hospitals can:
 
-Improve Patient Care: Identify patients who are at high risk of readmission and provide them with additional support, such as follow-up appointments, medication management, and education on self-care.
-Reduce Costs: Avoid the financial burden associated with unplanned readmissions, which can be substantial for both patients and healthcare providers.
-Optimize Resource Allocation: Focus resources on patients who need them most, ensuring that those at higher risk of readmission receive adequate care and attention.
-Enhance Hospital Reputation: Demonstrate a commitment to patient well-being and quality of care by actively working to prevent readmissions.
+
 
 
 
