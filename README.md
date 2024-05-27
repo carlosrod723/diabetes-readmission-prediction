@@ -52,7 +52,7 @@ Code: Jupyter notebook(s) containing the analysis and model development are avai
 
 
 
-![Race Distribution](images/Race-Distribution.png)
+
 
 
 
