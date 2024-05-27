@@ -272,15 +272,15 @@ Softmax Activation (Output Layer): The softmax activation function is used in th
 
 ![Confusion Matrix](images/Confusion-Matrix.png)
 
-The confusion matrix reveals crucial insights into the performance of the neural network in predicting diabetes readmission risk categories (0, 1, and 2).
+This confusion matrix provides insights into the performance of the neural network model in predicting diabetes patient readmission across three classes: 0 (not readmitted), 1 (readmitted within 30 days), and 2 (readmitted after 30 days).
 
-Class 0 (Low Risk): The model struggles to identify patients at low risk of readmission. It correctly predicted only 54 instances of class 0, while misclassifying 541 as class 1 and a significant 886 as class 2. This suggests a tendency to overestimate the risk for individuals who are unlikely to be readmitted.
+The diagonal values represent the correctly classified instances for each class. The model accurately predicted 5,872 patients as belonging to class 2 (readmitted after 30 days), 1,626 patients as class 1 (readmitted within 30 days), and 54 patients as class 0 (not readmitted).
 
-Class 1 (Moderate Risk): The model performs best with this category, correctly predicting 1,626 instances. However, it still exhibits a notable number of misclassifications, with 35 instances incorrectly assigned to class 0 and 2,850 to class 2. This implies room for improvement in distinguishing moderate-risk patients from both lower and higher-risk groups.
+However, the off-diagonal values reveal some misclassifications. For instance, 886 patients from class 0 were incorrectly predicted as class 2, and 541 patients from class 0 were misclassified as class 1. Similarly, 1,131 patients from class 2 were wrongly predicted as class 1, and 2,850 patients from class 1 were misclassified as class 2.
 
-Class 2 (High Risk): The model demonstrates relatively good performance for high-risk patients, correctly identifying 5,872 instances. However, there's still a considerable number of misclassifications, with 31 instances labeled as class 0 and 1,131 as class 1. This highlights the challenge of accurately pinpointing the highest-risk individuals.
+These misclassifications, particularly between classes 1 and 2, suggest that the model may have difficulty distinguishing between patients readmitted within 30 days and those readmitted after 30 days. This aligns with the lower precision and recall scores observed for class 1 in the classification report.
 
-The confusion matrix indicates that the model has a tendency to overestimate the risk of readmission, particularly for patients in the low-risk category. While it performs best with moderate-risk patients, there's still room for improvement in accurately classifying patients across all risk levels. Further refinement of the model, potentially through adjustments to its architecture, hyperparameters, or training data, could help enhance its ability to distinguish between the different readmission risk categories.
+While the confusion matrix shows that the model correctly classified a substantial number of instances, the misclassifications between classes 1 and 2 indicate potential areas for improvement, especially in accurately identifying patients at risk of readmission within the critical 30-day window.
 
 #### 4. Classification Report
 
