@@ -36,19 +36,21 @@ Cleaning: Missing values are handled, data types are converted (e.g., age to ord
 
 Preparation: The cleaned dataset is exported to a CSV file for further analysis.
 
+(For the detailed code implementation and in-depth analysis, please see the accompanying 'PostgreSQL.md' file)
+
 #### 2. Exploratory Data Analysis and Model Development (AWS SageMaker Jupyter Notebook)
 
 Analysis: The dataset is loaded into a Jupyter notebook in AWS SageMaker.
 
 Visualization: Exploratory data analysis is performed to uncover insights and relationships within the data.
 
-Model Building: Various machine learning models are developed and evaluated to select the best performing model for predicting readmission.
+Model Building: AN XGBoost model and a neural network have been developed and evaluated to select the best performing model for predicting readmission.
 
 #### 3. Model Deployment 
 
 Documentation: The entire project, including data preprocessing steps, code for analysis and model development, and model evaluation results, is thoroughly documented in this repository's README file.
 
-Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
+Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook(2).ipynb'.
 
 ### VI- Dataset EDA Analysis 
 
@@ -238,7 +240,11 @@ Precision: The fraction of instances predicted as positive that were actually po
 
 Accuracy: The fraction of total instances that were correctly classified by the model. It measures the overall correctness across all classes.
 
-### VIII- Model Deployment
+### VIII- Neural Network
+
+
+
+### IX- Model Deployment
 
 Initially, my project aimed to leverage a comprehensive AWS ecosystem for an end-to-end diabetes readmission prediction solution. The architecture involved PostgreSQL as the database, Amazon S3 for data storage, Jupyter notebooks for development, and of course, SageMaker for model training and deployment.  I established robust Identity and Access Management (IAM) roles and policies to manage permissions across services.
 
