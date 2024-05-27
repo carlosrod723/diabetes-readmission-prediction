@@ -184,45 +184,117 @@ These distributions highlight the emergency-driven nature of hospital admissions
 
 ### VII- XGBoost Model
 
+#### 1. Model Justification
 
+XGBoost (eXtreme Gradient Boosting) is a powerful machine learning algorithm known for its exceptional performance in various classification and regression tasks. In the context of diabetes readmission prediction, XGBoost offers several advantages:
 
+**Handles Complex Relationships**: Diabetes readmission is influenced by a multitude of factors, including patient demographics, medical history, medication adherence, and socioeconomic status. XGBoost excels at capturing complex non-linear relationships between these variables, potentially leading to more accurate predictions than simpler models.
 
-# Initialize SageMaker session
+**Feature Importance**: XGBoost provides insights into the importance of each feature in the prediction process. This information is valuable for healthcare professionals to understand the key drivers of readmission and develop targeted interventions.
+
+**Regularization**: XGBoost incorporates regularization techniques that help prevent overfitting, a common challenge in healthcare data with a limited number of samples. This ensures the model generalizes well to new, unseen patient data.
+
+**Scalability**: XGBoost is designed to handle large datasets efficiently, making it suitable for healthcare settings where substantial amounts of patient data are often collected.
+
+#### 2. Hyperparameter Choices
+
+**test_size=0.2**: This means that 20% of the data is reserved for testing the model's performance on unseen data, while the remaining 80% is used for training. This split helps assess how well the model generalizes to new patients.
+
+**n_estimators**: Number of boosting rounds (trees).
+
+**max_depth**: Maximum depth of each tree. Deeper trees can capture more complexity but may overfit.
+
+**learning_rate**: Step size shrinkage to prevent overfitting. Smaller values make learning slower but potentially more robust.
+
+**subsample**: Fraction of samples used for fitting each tree. Less than 1 helps prevent overfitting.
+
+**colsample_bytree**: Fraction of features used for each tree.
+
+These hyperparameters control the model's complexity and learning process. GridSearchCV systematically tries different combinations to find the best-performing set.
+
+#### 3. Analysis of GridSearchCV
+
+GridSearchCV performs an exhaustive search over the specified parameter grid using cross-validation (cv=3). It evaluates each combination using the accuracy scoring metric and selects the model with the highest average cross-validated accuracy.  The verbose=1 option provides progress updates during the search. n_jobs=-1 utilizes all available processors for faster computation.
+
+#### 4. Classification Report
+
+The classification report evaluates the performance of the XGBoost model in predicting diabetes patient readmission after 30 days, with three classes: 0 (not readmitted), 1 (readmitted within 30 days), and 2 (readmitted after 30 days).
+
+The overall accuracy of the model is 0.58, which means that the model correctly predicts the readmission status for 58% of the patients. This accuracy score is not particularly impressive, indicating that the model has room for improvement in its predictive performance.
+
+Looking at the class-specific metrics, the precision for class 1 (readmitted within 30 days) is 0.50, which means that only 50% of the patients predicted to be readmitted within 30 days were actually readmitted within that timeframe. This precision score is quite low, suggesting that the model may be generating a significant number of false positives for this class.
+
+The recall score for class 1 is 0.36, indicating that the model correctly identified only 36% of the patients who were actually readmitted within 30 days. This low recall score means that the model is missing a substantial portion of the true positive cases, which could be problematic for hospitals aiming to identify and prioritize high-risk patients.
+
+The f1-score for class 1, which balances precision and recall, is 0.42, further highlighting the model's suboptimal performance in predicting readmissions within 30 days.
+
+For hospitals, these results suggest that the current XGBoost model may not be reliable enough for accurately identifying diabetes patients at risk of readmission within the critical 30-day window. Improvements to the model's performance, particularly in terms of precision and recall for the class 1 (readmitted within 30 days), would be necessary before deploying it in a clinical setting.
+
+**Metrics**
+
+Recall: The fraction of true positive instances that were correctly identified by the model. High recall means the model missed fewer positive instances.
+
+Precision: The fraction of instances predicted as positive that were actually positive. High precision means fewer false positive predictions.
+
+Accuracy: The fraction of total instances that were correctly classified by the model. It measures the overall correctness across all classes.
+
+### VIII- Model Deployment
+
+Initially, my project aimed to leverage a comprehensive AWS ecosystem for an end-to-end diabetes readmission prediction solution. The architecture involved PostgreSQL as the database, Amazon S3 for data storage, Jupyter notebooks for development, and of course, SageMaker for model training and deployment.  I established robust Identity and Access Management (IAM) roles and policies to manage permissions across services.
+
+Despite careful configuration and validation of IAM roles, S3 bucket permissions, and other access controls, I encountered persistent "Access Denied" errors. This prevented seamless data transfer and model deployment, hindering my progress within the AWS environment.
+
+The following code snippet outlines my intended approach, showcasing how I leveraged SageMaker's integrated features for model development. However, due to the most unfortunate aforementioned access issues, I was unable to fully execute this deployment within the AWS environment.
+
+**#Import libraries and packages**
+import sagemaker
+from sagemaker.estimator import Estimator
+from sagemaker.inputs import TrainingInput
+import boto3
+import pandas as pd
+
+**#Initialize SageMaker session**
 session = sagemaker.Session()
 
-# Define S3 paths for training and validation data
-train_data_s3_path = 's3://your-bucket/train/train_data.csv'
-validation_data_s3_path = 's3://your-bucket/validation/validation_data.csv'
+**#Define S3 paths (replace placeholders)**
+bucket_name = "datasets-for-ml"  
+train_data_s3_path = f"s3://{bucket_name}/train/train_data.csv"
+validation_data_s3_path = f"s3://{bucket_name}/validation/validation_data.csv"
+model_artifacts_s3_path = f"s3://{bucket_name}/output/xgboost_model.tar.gz"  # Output path
 
-# Define S3 paths for model artifacts
-model_artifacts_s3_path = 's3://your-bucket/path/to/model.tar.gz'
-
-# Ensure your data is in S3
+**#Ensure data is in S3**
 s3_client = boto3.client('s3')
 try:
-    s3_client.head_object(Bucket='your-bucket', Key='train/train_data.csv')
-    s3_client.head_object(Bucket='your-bucket', Key='validation/validation_data.csv')
+    s3_client.head_object(Bucket=bucket_name, Key='train/train_data.csv')
+    s3_client.head_object(Bucket=bucket_name, Key='validation/validation_data.csv')
 except Exception as e:
-    print("Ensure your data files are uploaded to S3:", e)
+    raise ValueError(f"Ensure your data files are uploaded to S3: {e}")
 
-# Configure SageMaker Estimator
+**#Configure SageMaker Estimator (add hyperparameters)**
 xgb = Estimator(
-    image_uri=sagemaker.image_uris.retrieve("xgboost", session.boto_region_name, version="1.2-1"),
+    image_uri=sagemaker.image_uris.retrieve("xgboost", session.boto_region_name, version="1.5-1"),  # Latest version
     role=sagemaker.get_execution_role(),
     instance_count=1,
-    instance_type='ml.m5.large',
-    output_path='s3://your-bucket/output/',
-    model_uri=model_artifacts_s3_path  # Specify the model artifacts path
+    instance_type='ml.m5.xlarge',  # More powerful instance for faster training
+    output_path=model_artifacts_s3_path,
+    hyperparameters={
+        "max_depth": "5",
+        "eta": "0.2",
+        "gamma": "4",
+        "min_child_weight": "6",
+        "subsample": "0.8",
+        "objective": "binary:logistic",  # Example for binary classification
+        "num_round": "100"
+    }
 )
 
-# Train the model (or skip this step if model artifacts are already available)
+**#Train the model**
 xgb.fit({'train': TrainingInput(train_data_s3_path), 'validation': TrainingInput(validation_data_s3_path)})
 
-# Deploy the model
-predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m5.large')
+**#Deploy the model**
+predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m4.xlarge') # Deployment instance
 
-# Example prediction (ensure your test data is prepared)
-test_data = pd.read_csv('test_data.csv')  # Load your test data
-predictions = predictor.predict(test_data)
-
+**#Example prediction**
+test_data = pd.read_csv('test_data.csv')
+predictions = predictor.predict(test_data.to_numpy())
 print(predictions)
