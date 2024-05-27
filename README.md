@@ -50,7 +50,7 @@ Model Building: AN XGBoost model and a neural network have been developed and ev
 
 Documentation: The entire project, including data preprocessing steps, code for analysis and model development, and model evaluation results, is thoroughly documented in this repository's README file.
 
-Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook(2).ipynb'.
+Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook(3).ipynb'.
 
 ### VI- Dataset EDA Analysis 
 
