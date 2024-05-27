@@ -50,6 +50,37 @@ Documentation: The entire project, including data preprocessing steps, code for 
 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
 
+## Dataset EDA & Model Analysis 
+
+##### Analysis of the Diabetes Dataset for Numeric Columns
+
+The dataset comprises information from 101,766 encounters, each represented by a unique encounter_id and patient_nbr. These identifiers serve as unique keys, ensuring each record is distinct.
+
+A significant aspect of the dataset is the distribution of admission_type_id, with a mean value of 2.02. The majority of admissions fall under the lower-numbered categories, with the median value being 1, indicating that the most frequent admission type is category 1. Similarly, the discharge_disposition_id shows a mean of 3.72, but the median value is 1, suggesting that most discharges fall under category 1. The admission_source_id reveals a variety of admission sources, with a median value of 7, pointing to category 7 as a common source.
+
+The average length of stay in the hospital (time_in_hospital) is approximately 4.40 days, with a median of 4 days, indicating that half of the patients stay for four days or less. This is coupled with a high number of lab procedures per encounter, with an average of 43 procedures and a median of 44, showing that extensive testing is typical for these patients.
+
+Patients typically undergo about one procedure (num_procedures), and the average number of medications prescribed (num_medications) is 16, highlighting the complexity of managing diabetes, which often involves multiple medications. Despite the high average, the number of outpatient (number_outpatient), emergency (number_emergency), and inpatient visits (number_inpatient) are relatively low, with most patients not having these visits. However, the variability in these counts suggests that a subset of patients experiences frequent visits.
+
+The dataset also reveals a high number of diagnoses per patient, with an average of 7.42 diagnoses, underscoring the multifaceted nature of diabetes and its associated conditions.
+
+The dataset highlights the extensive medical interactions and complex management required for diabetic patients, with multiple medications and frequent lab procedures being the norm. The dominance of specific admission types, discharge dispositions, and admission sources will be crucial areas for further analysis. Understanding these patterns will be essential for predicting readmission rates and improving patient outcomes.
+
+#### Analysis of the Diabetes Dataset for Categorical Columns
+
+The categorical summary of the diabetes dataset reveals several key insights into the patient demographics and medical characteristics. The dataset includes six unique races, with Caucasians forming the majority at 76,099 instances. Gender distribution shows a higher frequency of females, accounting for 54,708 records. The age distribution is divided into ten categories, with the most common age group being 70-80 years, comprising 26,068 patients.
+
+A significant portion of the dataset has missing or unspecified values in the payer_code and medical_specialty columns, marked by the top value '?', appearing 40,256 and 49,949 times, respectively. This indicates a need for careful handling of these missing values during analysis.
+
+In terms of diagnoses, there is a substantial variety, with diag_1 having 717 unique codes, diag_2 having 749, and diag_3 having 790. The most frequent primary diagnosis code (428) appears 6,862 times.
+
+Medication use is also diverse, though the top value for all medications is 'No', indicating that many patients are not on these specific medications. For instance, 81,778 records indicate no use of metformin, and 100,227 indicate no use of repaglinide. However, insulin usage is significant, with 47,383 instances, which is to be expected for diabetes patients.
+
+Most patients have not experienced changes in their medication regimens (change column), and the majority are on diabetes medication (diabetesMed column), with 78,363 records indicating 'Yes'.
+
+The readmitted column, which is crucial for our prediction goal, shows three unique values with 'NO' being the most frequent, appearing 54,864 times.
+
+These insights highlight the need for targeted analysis and feature engineering, especially in handling missing values and understanding the impact of various demographic and medical features on readmission rates. The prevalence of certain diagnoses, the extensive non-use of many medications, and the high rate of specific readmission outcomes will be critical in building predictive models.
 
 ![Readmission Status](images/Readmission-Status.png)
 
@@ -57,7 +88,86 @@ Code: Jupyter notebook(s) containing the analysis and model development are avai
 
 The bar chart displaying the distribution of readmission status among patients reveals a significant imbalance. The majority of patients were not readmitted (labeled as "NO"), with approximately 54,864 instances. This is followed by patients readmitted after more than 30 days ("">30"), accounting for around 35,000 instances. The smallest group consists of patients readmitted within 30 days ("<30"), with approximately 11,902 instances. This imbalance in the target variable indicates that most patients did not experience readmission, and only a smaller fraction were readmitted within the 30-day window, which is crucial for our prediction goal. Addressing this imbalance will be essential in the subsequent steps of model development to ensure the model's effectiveness and reliability in predicting readmissions.
 
+![Age Distribution](images/Age-Distribution.png)
 
+#### Age Distribution
+
+The age distribution chart indicates that the majority of patients in the dataset are older adults, with the most represented age groups being 70-80 and 60-70, comprising around 26,000 and 23,000 patients, respectively. This is followed by the 50-60 age group, with approximately 17,000 patients. The youngest age groups (e.g., 0-10, 10-20, and 20-30) have very few patients, suggesting that the dataset predominantly includes older individuals. This age distribution aligns with the typical demographic for diabetes patients, who are more likely to be older adults. Understanding this age distribution is crucial for tailoring the predictive model and potential interventions to the demographic most at risk of readmission.
+
+![Gender Distribution](images/Gender-Distribution.png)
+
+#### Gender Distribution Chart
+
+The gender distribution chart reveals that the dataset consists predominantly of female patients, making up a slight majority compared to male patients. Specifically, there are slightly more female patients than male patients. Additionally, there is a small category labeled "Unknown/Invalid," indicating some entries with missing or invalid gender information. This distribution suggests that while the dataset is fairly balanced between male and female patients, any analysis or modeling should consider the presence of entries with unspecified gender, which may need to be handled appropriately during data preprocessing.
+
+![Race Distribution](images/Race-Distribution.png)
+
+##### Race Distribution Chart
+
+The race distribution chart highlights a significant predominance of Caucasian patients in the dataset, constituting the majority by a large margin. African American patients form the second-largest group but are considerably fewer in number compared to Caucasian patients. The categories 'Other,' 'Asian,' and 'Hispanic' are represented minimally, indicating a less diverse dataset. Additionally, there is a small portion of entries with unspecified race labeled as '?'. This imbalance suggests that the dataset may not fully represent the diversity of the broader population, and any analysis or modeling should account for this skew to ensure generalizability and fairness.
+
+![Correlation Matrix](images/Correlation-Matrix.png)
+
+##### Correlation Matrix
+
+The correlation matrix provides insights into the relationships between various numeric features in the dataset. The highest positive correlations are observed between num_medications and number_inpatient (0.39), as well as num_medications and number_outpatient (0.27), indicating that patients with more medications tend to have more inpatient and outpatient visits. Additionally, time_in_hospital shows a moderate correlation with num_lab_procedures (0.32) and num_medications (0.47), suggesting that longer hospital stays are associated with more lab procedures and medications. Most other correlations are relatively low, indicating that there are no strong linear relationships between the majority of numeric features. This suggests that a combination of multiple features will likely be necessary to build an effective predictive model for hospital readmission.
+
+
+![Boxplot 1](images/Boxplot-1.png)
+
+![Boxplot 2](images/Boxplot-2.png)
+
+![Boxplot 3](images/Boxplot-3.png)
+
+![Boxplot 4](images/Boxplot-4.png)
+
+![Boxplot 5](images/Boxplot-5.png)
+
+![Boxplot 6](images/Boxplot-6.png)
+
+![Boxplot 7](images/Boxplot-7.png)
+
+![Boxplot 8](images/Boxplot-8.png)
+
+##### Boxplots
+
+The boxplots provide a visual summary of the distribution of various numeric features in relation to the readmission status of patients. Here are the key insights:
+
+Time in Hospital vs. Readmitted: The median time in the hospital is consistent across different readmission statuses. Patients who are not readmitted tend to have a shorter hospital stay compared to those readmitted within 30 days or after 30 days.
+
+Num Lab Procedures vs. Readmitted: The number of lab procedures does not show a significant difference across different readmission statuses. The distribution is fairly consistent, indicating that the number of lab procedures might not be a strong indicator of readmission.
+
+Num Procedures vs. Readmitted: Similar to lab procedures, the number of procedures does not vary significantly across different readmission statuses. This suggests that the number of procedures is not a major factor in predicting readmission.
+
+Num Medications vs. Readmitted: The number of medications shows a slight increase for patients not readmitted compared to those readmitted within 30 days. This might indicate that better medication management could potentially reduce the chances of early readmission.
+
+Number Outpatient vs. Readmitted: The number of outpatient visits appears higher for patients not readmitted, suggesting that regular outpatient follow-ups might help in reducing readmissions.
+
+Number Emergency vs. Readmitted: The number of emergency visits shows a wider range for patients not readmitted, indicating that those not readmitted might have had more emergency visits managed effectively.
+
+Number Inpatient vs. Readmitted: The number of inpatient stays is slightly higher for patients readmitted within 30 days, suggesting a potential correlation between inpatient frequency and readmission risk.
+
+Number Diagnoses vs. Readmitted: The number of diagnoses is higher for patients readmitted within 30 days, which could indicate that patients with more diagnoses are at a higher risk of early readmission.
+
+These insights provide a foundation for understanding which features may influence patient readmission and guide further feature engineering and model development.
+
+![Countplot 1](images/Countplot-1.png)
+
+![Countplot 2](images/Countplot-2.png)
+
+![Countplot 3](images/Countplot-3.png)
+
+##### Distribution of Admission Type, Discharge Disposition and Admission Source
+
+The charts for admission_type_id, discharge_disposition_id, and admission_source_id provide important insights into the dataset's composition and patient flow within the hospital system.
+
+Admission Type Distribution: The majority of admissions are of type 1, which is likely to be emergency admissions, indicating that most patients are admitted under urgent circumstances. Other admission types such as 2 and 3 also have significant counts, representing elective and other scheduled admissions.
+
+Discharge Disposition Distribution: A large proportion of patients are discharged to home (1), followed by discharge to home with home health care (6). The high count for discharged to home suggests that many patients recover sufficiently to go back to their homes without additional healthcare services.
+
+Admission Source Distribution: Most admissions come from the emergency room (7), followed by physician referral (1). This highlights the role of the emergency room as a primary entry point for patients, with a significant number also being referred by healthcare professionals.
+
+These distributions highlight the emergency-driven nature of hospital admissions in this dataset and the prevalent discharge practices, which are crucial for understanding patient flow and resource allocation in the hospital setting.
 
 
 
