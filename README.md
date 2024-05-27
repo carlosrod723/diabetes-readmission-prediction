@@ -51,9 +51,11 @@ Documentation: The entire project, including data preprocessing steps, code for 
 Code: Jupyter notebook(s) containing the analysis and model development are available in the repository, 'diabetes-j-notebook.ipynb'.
 
 
+![Readmission Status(images/Readmission-Status.png)
 
+#### Distribution of Readmission Status
 
-
+The bar chart displaying the distribution of readmission status among patients reveals a significant imbalance. The majority of patients were not readmitted (labeled as "NO"), with approximately 54,864 instances. This is followed by patients readmitted after more than 30 days ("">30"), accounting for around 35,000 instances. The smallest group consists of patients readmitted within 30 days ("<30"), with approximately 11,902 instances. This imbalance in the target variable indicates that most patients did not experience readmission, and only a smaller fraction were readmitted within the 30-day window, which is crucial for our prediction goal. Addressing this imbalance will be essential in the subsequent steps of model development to ensure the model's effectiveness and reliability in predicting readmissions.
 
 
 
