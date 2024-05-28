@@ -320,54 +320,62 @@ Despite careful configuration and validation of IAM roles, S3 bucket permissions
 The following code snippet outlines my intended approach, showcasing how I leveraged SageMaker's integrated features for model development. However, due to the most unfortunate aforementioned access issues, I was unable to fully execute this deployment within the AWS environment.
 
 **#Import libraries and packages**
-import sagemaker
-from sagemaker.estimator import Estimator
-from sagemaker.inputs import TrainingInput
-import boto3
-import pandas as pd
+
+- import sagemaker
+- from sagemaker.estimator import Estimator
+- from sagemaker.inputs import TrainingInput
+- import boto3
+- import pandas as pd
 
 **#Initialize SageMaker session**
-session = sagemaker.Session()
+
+- session = sagemaker.Session()
 
 **#Define S3 paths (replace placeholders)**
-bucket_name = "datasets-for-ml"  
-train_data_s3_path = f"s3://{bucket_name}/train/train_data.csv"
-validation_data_s3_path = f"s3://{bucket_name}/validation/validation_data.csv"
-model_artifacts_s3_path = f"s3://{bucket_name}/output/xgboost_model.tar.gz"  # Output path
+
+- bucket_name = "datasets-for-ml"  
+- train_data_s3_path = f"s3://{bucket_name}/train/train_data.csv"
+- validation_data_s3_path = f"s3://{bucket_name}/validation/validation_data.csv"
+- model_artifacts_s3_path = f"s3://{bucket_name}/output/xgboost_model.tar.gz"  # Output path
 
 **#Ensure data is in S3**
-s3_client = boto3.client('s3')
-try:
-    s3_client.head_object(Bucket=bucket_name, Key='train/train_data.csv')
-    s3_client.head_object(Bucket=bucket_name, Key='validation/validation_data.csv')
-except Exception as e:
-    raise ValueError(f"Ensure your data files are uploaded to S3: {e}")
+
+- s3_client = boto3.client('s3')
+- try:
+    - s3_client.head_object(Bucket=bucket_name, Key='train/train_data.csv')
+    - s3_client.head_object(Bucket=bucket_name, Key='validation/validation_data.csv')
+- except Exception as e:
+    - raise ValueError(f"Ensure your data files are uploaded to S3: {e}")
 
 **#Configure SageMaker Estimator (add hyperparameters)**
-xgb = Estimator(
-    image_uri=sagemaker.image_uris.retrieve("xgboost", session.boto_region_name, version="1.5-1"),  # Latest version
-    role=sagemaker.get_execution_role(),
-    instance_count=1,
-    instance_type='ml.m5.xlarge',  # More powerful instance for faster training
-    output_path=model_artifacts_s3_path,
-    hyperparameters={
-        "max_depth": "5",
-        "eta": "0.2",
-        "gamma": "4",
-        "min_child_weight": "6",
-        "subsample": "0.8",
-        "objective": "binary:logistic",  # Example for binary classification
-        "num_round": "100"
-    }
-)
+
+- xgb = Estimator(
+    - image_uri=sagemaker.image_uris.retrieve("xgboost", session.boto_region_name, version="1.5-1"),  # Latest version
+    - role=sagemaker.get_execution_role(),
+    - instance_count=1,
+    - instance_type='ml.m5.xlarge',  # More powerful instance for faster training
+    - output_path=model_artifacts_s3_path,
+    - hyperparameters={
+        - "max_depth": "5",
+        - "eta": "0.2",
+        - "gamma": "4",
+        - "min_child_weight": "6",
+        - "subsample": "0.8",
+        - "objective": "binary:logistic",  # Example for binary classification
+        - "num_round": "100"
+    - }
+- )
 
 **#Train the model**
-xgb.fit({'train': TrainingInput(train_data_s3_path), 'validation': TrainingInput(validation_data_s3_path)})
+
+- xgb.fit({'train': TrainingInput(train_data_s3_path), 'validation': TrainingInput(validation_data_s3_path)})
 
 **#Deploy the model**
-predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m4.xlarge') # Deployment instance
+
+- predictor = xgb.deploy(initial_instance_count=1, instance_type='ml.m4.xlarge') # Deployment instance
 
 **#Example prediction**
-test_data = pd.read_csv('test_data.csv')
-predictions = predictor.predict(test_data.to_numpy())
-print(predictions)
+
+- test_data = pd.read_csv('test_data.csv')
+- predictions = predictor.predict(test_data.to_numpy())
+- print(predictions)
